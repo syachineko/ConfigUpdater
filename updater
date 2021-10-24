@@ -1,0 +1,35 @@
+#!/usr/bin/python3
+
+import subprocess
+import time
+import datetime
+import sys
+
+# input variables
+# [<backupFile>,[<filename1>,<paramName1:param1>,...],[<filename2>,<paramName1:param1>,...]]
+configs = ["/tmp/backup",["/root/updater/test1.conf","sample1:XX","sample2:YY"],["/root/updater/test2.conf","samplea:rafe"]]
+backupDir = configs.pop(0)
+now = datetime.datetime.now()
+timestamp = now.strftime("%y%m%d%H%M%S")
+
+# replace item
+for items in configs:
+
+    count = 0
+    filePath = items.pop(0)
+    fileName = filePath.split("/")[-1]
+    print("backup File--------------------------------")
+    print(backupDir+"/"+fileName+"_bk_"+timestamp)
+    res = subprocess.run(["cp","-p",filePath,backupDir+"/"+fileName+"_bk_"+timestamp], stdout=subprocess.PIPE)
+
+    # open(fileName)
+    for i in items:
+        line,param = i.split(":")
+    
+        # sed sed -i -e '/^#/d' filter.proper
+        res = subprocess.call(["sed","-i","-e","s/^"+line+"=.*/"+line+"="+param+"/g",filePath], stdout=subprocess.PIPE)
+        count+=1
+
+    diff = subprocess.call(["diff",filePath,backupDir+"/"+fileName+"_bk_"+timestamp], stdout=subprocess.PIPE)
+    print("Rewrite in "+fileName+"----------------------")
+    print(str(count)+" items!")
